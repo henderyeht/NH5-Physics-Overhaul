@@ -14,9 +14,30 @@ namespace SimHandling
     {
         private const int HeaderHeight = 110;
         private const string About =
-            "This changes how NASCAR Heat 5 drives. The stock game feels like an arcade racer: the car stays glued down, and the assists catch a slide before it starts. Physics Overhaul moves the tire and the balance toward a race simulator. The tire holds, then lets go when you ask too much of it. The car rotates when you lift or brake. Help from the wall, the brakes, and the racing line is pulled back, so the car wants a smoother hand.\r\n\r\n"
-            + "The driving-aid menu is unchanged. Expert is the raw car. Easy, Normal, and Hard still add help on top of this.\r\n\r\n"
-            + "Close Heat 5 first. Apply writes this onto the selected game. Remove puts the original handling back. A grip change you make afterward in Engine Modifier is left as it is.";
+            "Physics Overhaul changes these values on Cup, Xfinity, Trucks, and Next Gen:\r\n"
+            + "- Tire grip\r\n"
+            + "- Grip under load\r\n"
+            + "- Straight-line grip\r\n"
+            + "- Grip falloff\r\n"
+            + "- Drag\r\n"
+            + "- Front downforce\r\n"
+            + "- Rear downforce\r\n"
+            + "\r\n"
+            + "Dirt changes grip falloff.\r\n"
+            + "\r\n"
+            + "Every track changes:\r\n"
+            + "- Draft length\r\n"
+            + "- Draft width\r\n"
+            + "\r\n"
+            + "Left as they are:\r\n"
+            + "- Driving aids\r\n"
+            + "- Garage setup\r\n"
+            + "- Track grip settings\r\n"
+            + "\r\n"
+            + "Close Heat 5 first.\r\n"
+            + "Apply writes this onto the selected folder.\r\n"
+            + "Remove puts these values back.\r\n"
+            + "A later grip change in Engine Modifier is left in place.";
         private readonly ComboBox _builds;
         private readonly Label _status;
         private readonly Label _path;
@@ -177,7 +198,7 @@ namespace SimHandling
                 var on = HandlingPatch.IsApplied(install.Dll);
                 _status.ForeColor = on ? Theme.Yellow : Theme.Mute;
                 _status.Text = on
-                    ? "Physics Overhaul is on this build. Expert is the raw car. Easy, Normal, and Hard still add help."
+                    ? "Physics Overhaul is on this build. Driving aids, garage setup, and track grip settings are unchanged."
                     : "Physics Overhaul is off this build.";
             }
             catch (Exception ex)
