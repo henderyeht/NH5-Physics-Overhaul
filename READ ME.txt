@@ -1,0 +1,7 @@
+Physics Overhaul
+
+Double-click SimHandling.exe in this folder. Close NASCAR Heat 5 first.
+
+The list shows each game folder's path. Add build picks another Heat 5 folder. APPLY writes the tire and aero patch into that install. REMOVE puts those numbers back. A backup is kept outside the game folder.
+
+Expert is the raw car. Hard, Normal, and Easy still add the in-game assists.
