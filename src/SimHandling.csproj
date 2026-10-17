@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net48</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <RootNamespace>SimHandling</RootNamespace>
+    <AssemblyName>SimHandling</AssemblyName>
+    <Product>NASCAR Heat 5 Sim Handling</Product>
+    <AssemblyTitle>NASCAR Heat 5 Sim Handling</AssemblyTitle>
+    <Description>Applies a sim-style tire and scales Heat 5 driving aids from Easy through Expert.</Description>
+    <Version>1.0.0</Version>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <GenerateSupportedRuntime>false</GenerateSupportedRuntime>
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Mono.Cecil" Version="0.11.5" />
+    <EmbeddedResource Include="Assets\heat5-logo.png" LogicalName="SimHandling.heat5-logo.png" />
+    <EmbeddedResource Include="Assets\banner-header.jpg" LogicalName="SimHandling.banner-header.jpg" />
+    <EmbeddedResource Include="Assets\icon-physics.jpg" LogicalName="SimHandling.icon-physics.jpg" />
+  </ItemGroup>
+</Project>
