@@ -1,7 +1,28 @@
 Physics Overhaul
 
-Double-click SimHandling.exe in this folder. Close NASCAR Heat 5 first.
+Double-click SimHandling.exe. Close NASCAR Heat 5 first.
 
-The list shows each game folder's path. Add build picks another Heat 5 folder. APPLY writes the tire and aero patch into that install. REMOVE puts those numbers back. A backup is kept outside the game folder.
+Cup, Xfinity, Trucks, and Next Gen:
+- Tire grip
+- Grip under load
+- Straight-line grip
+- Grip falloff
+- Drag
+- Front downforce
+- Rear downforce
 
-Expert is the raw car. Hard, Normal, and Easy still add the in-game assists.
+Dirt:
+- Grip falloff
+
+Every track:
+- Draft length
+- Draft width
+
+Left as they are:
+- Driving aids
+- Garage setup
+- Track grip settings
+
+The list shows each game folder. Add build picks another folder.
+Apply writes this onto that folder. Remove puts these values back.
+A later grip change in Engine Modifier is left in place.
