@@ -100,13 +100,15 @@ namespace SimHandling
             {
                 Location = new Point(20, HeaderHeight + 82),
                 Size = new Size(520, 300),
-                BackColor = Theme.Panel
+                BackColor = Theme.Panel,
+                AutoScroll = true
             };
             panel.Paint += (_, e) => Theme.PaintLeftAccent(e.Graphics, panel.Height);
             panel.Controls.Add(new Label
             {
-                Dock = DockStyle.Fill,
-                Padding = new Padding(16, 12, 12, 12),
+                Location = new Point(12, 8),
+                AutoSize = true,
+                MaximumSize = new Size(480, 0),
                 ForeColor = Theme.White,
                 BackColor = Theme.Panel,
                 Text = About
