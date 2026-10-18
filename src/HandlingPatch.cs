@@ -463,16 +463,16 @@ namespace SimHandling
                 yield return edit;
             }
             // Wake is strongest inside a car length and still present out to about three.
-            // Side draft is the close lateral gap, so the bubble reaches a car on the door.
+            // Width and strength sit halfway between stock and the wider bubble.
             yield return F("Physics", "MakeDefault", "max_draft_lon_carlen", 3f, 18.85f, true);
             yield return F("Physics", "MakeDefault", "min_draft_width_carwid", 0.125f, 0.763f, true);
-            yield return F("Physics", "MakeDefault", "max_draft_width_carwid", 1.25f, 0.992f, true);
-            yield return F("Physics", "MakeDefault", "draft_influence", 0.3f, 0.1575f, true);
+            yield return F("Physics", "MakeDefault", "max_draft_width_carwid", 1.121f, 0.992f, true);
+            yield return F("Physics", "MakeDefault", "draft_influence", 0.22875f, 0.1575f, true);
             foreach (var method in new[] { "SetRestrictorPackage_Speedway_WithDucts", "SetRestrictorPackage_Speedway_NoDucts" })
             {
                 yield return F("Physics", method, "max_draft_lon_carlen", 3f, 12f, true);
                 yield return F("Physics", method, "min_draft_width_carwid", 0.125f, 1f, true);
-                yield return F("Physics", method, "max_draft_width_carwid", 1.25f, 1.2f, true);
+                yield return F("Physics", method, "max_draft_width_carwid", 1.225f, 1.2f, true);
             }
         }
 
