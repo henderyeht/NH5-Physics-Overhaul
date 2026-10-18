@@ -4,6 +4,8 @@ Double-click SimHandling.exe. Close NASCAR Heat 5 first.
 
 Changes:
 - Grip falloff
+- Corner grip
+- Tire stiffness
 - Draft length
 - Draft width
 
@@ -18,7 +20,10 @@ Built-in assists turned off:
 Still uses the game settings:
 - Driving aid menu
 - Garage setup
-- Track grip settings
+- Tire wear
+- Draft strength
+
+Competition keeps those settings. It still forces expert aids, faster wear, and lower draft strength.
 
 The list shows each game folder. Add build picks another folder.
 Apply writes this onto that folder. Remove puts these values back.
