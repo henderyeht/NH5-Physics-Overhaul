@@ -20,6 +20,7 @@ namespace SimHandling
             + "- Tire stiffness\r\n"
             + "- Draft length\r\n"
             + "- Draft width\r\n"
+            + "- Draft effect\r\n"
             + "\r\n"
             + "Built-in assists turned off:\r\n"
             + "- Extra grip\r\n"
