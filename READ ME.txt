@@ -2,21 +2,23 @@ Physics Overhaul
 
 Double-click SimHandling.exe. Close NASCAR Heat 5 first.
 
-Cup, Xfinity, Trucks, and Next Gen:
-- Tire grip
-- Grip under load
-- Straight-line grip
+Changes:
 - Grip falloff
-- Drag
-- Front downforce
-- Rear downforce
-
-Dirt:
-- Grip falloff
-
-Every track:
 - Draft length
 - Draft width
+
+Built-in assists turned off:
+- Extra grip
+- Steering help
+- Racing line help
+- Brake help
+- Wall help
+- Stability help
+
+Still uses the game settings:
+- Driving aid menu
+- Garage setup
+- Track grip settings
 
 The list shows each game folder. Add build picks another folder.
 Apply writes this onto that folder. Remove puts these values back.
