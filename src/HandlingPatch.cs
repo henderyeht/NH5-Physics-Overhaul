@@ -24,7 +24,7 @@ namespace SimHandling
         public static bool IsApplied(string dllPath)
         {
             var bytes = File.ReadAllBytes(dllPath);
-            return ReadFloat(bytes, "SprintCupChassis", "make_default_axle", "magic_c") == 1.6f;
+            return ReadFloat(bytes, "SprintCupChassis", "make_default_axle", "magic_c") == 1.525f;
         }
 
         public static HandlingResult Apply(string dllPath)
@@ -399,34 +399,34 @@ namespace SimHandling
 
         private static IEnumerable<Edit> Edits()
         {
-            // Pacejka lateral C=1.6 peaks at 4 deg and keeps 59% of the force in a full slide.
-            // Corner grip is put back to the neutral 1 used before each track adds its own bonus.
+            // Curve sits a quarter of the way back from the sharper slide toward the earlier one.
+            // Peak stays at 4 deg on asphalt and 15 deg on dirt.
             // Competition still forces expert aids, faster wear, and a lower draft strength on top of these values.
-            const float peakB = 0.374151438f;
-            const float fade = 0.412214756f;
+            const float peakB = 0.416339666f;
+            const float fade = 0.321199238f;
             foreach (var type in new[] { "SprintCupChassis", "XfinityChassis", "TruckChassis", "SprintCupChassisDLC" })
             {
                 var required = type != "SprintCupChassisDLC";
                 yield return F(type, "make_default_axle", "magic_b", peakB, 1f, required);
-                yield return F(type, "make_default_axle", "magic_c", 1.6f, 1f, required);
+                yield return F(type, "make_default_axle", "magic_c", 1.525f, 1f, required);
                 yield return F(type, "make_default_axle", "grip_fade", fade, 0.05f, required);
                 yield return F(type, "make_default_axle", "grip_fade_start", 4f, 9f, required);
-                yield return F(type, "make_default_axle", "grip_fade_stop", 8f, 12f, required);
+                yield return F(type, "make_default_axle", "grip_fade_stop", 7.75f, 12f, required);
                 yield return F(type, "make_default_axle", "frict_k1", 1.2f, 1.2f, required);
                 yield return F(type, "make_default_axle", "frict_k2", 1.1f, 1.1f, required);
                 yield return F(type, "make_default_axle", "long_frict", 1.1f, 1.1f, required);
                 yield return F(type, "MakeLiteFrontAxle", "magic_b", peakB, 0.714f, required);
-                yield return F(type, "MakeLiteFrontAxle", "magic_c", 1.6f, 1.4f, required);
+                yield return F(type, "MakeLiteFrontAxle", "magic_c", 1.525f, 1.4f, required);
                 yield return F(type, "MakeLiteFrontAxle", "magic_e", 0f, -0.2f, required);
                 yield return F(type, "MakeLiteRearAxle", "magic_b", peakB, 0.714f, required);
-                yield return F(type, "MakeLiteRearAxle", "magic_c", 1.6f, 1.4f, required);
+                yield return F(type, "MakeLiteRearAxle", "magic_c", 1.525f, 1.4f, required);
                 yield return F(type, "MakeLiteRearAxle", "magic_e", 0f, -0.2f, required);
             }
 
             foreach (var type in new[] { "DirtBankedChassis", "DirtFlatChassis", "DirtRoadChassis", "EldoraTruckChassis" })
             {
-                yield return F(type, "make_default_axle", "magic_b", 0.09977372f, 1f, true);
-                yield return F(type, "make_default_axle", "magic_c", 1.6f, 1f, true);
+                yield return F(type, "make_default_axle", "magic_b", 0.11102391f, 1f, true);
+                yield return F(type, "make_default_axle", "magic_c", 1.525f, 1f, true);
             }
 
             yield return F("SprintCupChassis", "MakeChassis", "drag", 0.3f, 0.3f, true);
@@ -478,18 +478,18 @@ namespace SimHandling
 
         private static IEnumerable<Edit> CornerGrip()
         {
-            const float plateGrip = 0.8843537f;
-            const float plateStiff = 0.9416666f;
+            const float plateGrip = 0.988265336f;
+            const float plateStiff = 0.988749862f;
             foreach (var method in new[] { "SetAidsAndCompounds_Speedway", "SetAidsAndCompounds_RoadCourse", "SetAidsAndCompounds_ShortTrack" })
             {
                 foreach (var field in new[] { "grip_lf", "grip_lr", "grip_rf", "grip_rr" })
                 {
-                    yield return F("Physics", method, field, 1f, 1.47f, true);
+                    yield return F("Physics", method, field, 1.11750007f, 1.47f, true);
                 }
 
                 foreach (var field in new[] { "stiff_lf", "stiff_lr", "stiff_rf", "stiff_rr" })
                 {
-                    yield return F("Physics", method, field, 1f, 1.2f, true);
+                    yield return F("Physics", method, field, 1.05f, 1.2f, true);
                 }
             }
 
@@ -505,7 +505,7 @@ namespace SimHandling
 
             foreach (var field in new[] { "grip_lf", "grip_lr", "grip_rf", "grip_rr" })
             {
-                yield return F("Physics", "SetAidsAndCompounds_Dirt_BristolCup", field, 1.02040815f, 1.5f, false);
+                yield return F("Physics", "SetAidsAndCompounds_Dirt_BristolCup", field, 1.14030623f, 1.5f, false);
             }
         }
 
