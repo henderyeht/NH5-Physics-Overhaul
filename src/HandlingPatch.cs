@@ -399,14 +399,10 @@ namespace SimHandling
 
         private static IEnumerable<Edit> Edits()
         {
-            // Pacejka lateral shape C=1.3. Peak solved at 4 deg (Crowe: NASCAR slip is 2-4 deg).
-            // B = tan(pi / (2*C)) / 4. The 10.9% fade is 1 - sin(C*pi/2), spread across the stock 3 deg window.
-            // mu(800 lb)=1.437792 and mu(3000 lb)=1.131201 use Milliken's load exponent on a 2 G Indy corner.
+            // Pacejka lateral C=1.3, peak at 4 deg. Grip amount stays at the game values.
+            // Raised grip and downforce made the car easier, so those go back.
             const float peakB = 0.6591958f;
             const float fade = 0.1089935f;
-            const float muLight = 1.437792f;
-            const float muHeavy = 1.131201f;
-            const float muLong = 1.310076f;
             foreach (var type in new[] { "SprintCupChassis", "XfinityChassis", "TruckChassis", "SprintCupChassisDLC" })
             {
                 var required = type != "SprintCupChassisDLC";
@@ -415,9 +411,9 @@ namespace SimHandling
                 yield return F(type, "make_default_axle", "grip_fade", fade, 0.05f, required);
                 yield return F(type, "make_default_axle", "grip_fade_start", 4f, 9f, required);
                 yield return F(type, "make_default_axle", "grip_fade_stop", 7f, 12f, required);
-                yield return F(type, "make_default_axle", "frict_k1", muLight, 1.2f, required);
-                yield return F(type, "make_default_axle", "frict_k2", muHeavy, 1.1f, required);
-                yield return F(type, "make_default_axle", "long_frict", muLong, 1.1f, required);
+                yield return F(type, "make_default_axle", "frict_k1", 1.2f, 1.2f, required);
+                yield return F(type, "make_default_axle", "frict_k2", 1.1f, 1.1f, required);
+                yield return F(type, "make_default_axle", "long_frict", 1.1f, 1.1f, required);
                 yield return F(type, "MakeLiteFrontAxle", "magic_b", peakB, 0.714f, required);
                 yield return F(type, "MakeLiteFrontAxle", "magic_c", 1.3f, 1.4f, required);
                 yield return F(type, "MakeLiteFrontAxle", "magic_e", 0f, -0.2f, required);
@@ -432,36 +428,104 @@ namespace SimHandling
                 yield return F(type, "make_default_axle", "magic_c", 1.3f, 1f, true);
             }
 
-            yield return F("SprintCupChassis", "MakeChassis", "drag", 0.37f, 0.3f, true);
-            yield return F("SprintCupChassis", "MakeChassis", "front_lift", -0.503615f, -0.335f, true);
-            yield return F("SprintCupChassis", "MakeChassis", "rear_lift", -0.667583f, -0.36f, true);
-            yield return F("SprintCupChassis", "make_body_superspeedway", "drag", 0.407f, 0.33f, true);
-            yield return F("SprintCupChassis", "make_body_superspeedway", "front_lift", -0.286480f, -0.17f, true);
-            yield return F("SprintCupChassis", "make_body_superspeedway", "rear_lift", -0.505553f, -0.3f, true);
-            yield return F("XfinityChassis", "MakeChassis", "drag", 0.37f, 0.3f, true);
-            yield return F("XfinityChassis", "MakeChassis", "front_lift", -0.503615f, -0.335f, true);
-            yield return F("XfinityChassis", "MakeChassis", "rear_lift", -0.667583f, -0.36f, true);
-            yield return F("XfinityChassis", "make_body_superspeedway", "drag", 0.37f, 0.3f, true);
-            yield return F("XfinityChassis", "make_body_superspeedway", "front_lift", -0.286480f, -0.17f, true);
-            yield return F("XfinityChassis", "make_body_superspeedway", "rear_lift", -0.505553f, -0.3f, true);
-            yield return F("TruckChassis", "MakeChassis", "drag", 0.37f, 0.3f, true);
-            yield return F("TruckChassis", "MakeChassis", "front_lift", -0.580981f, -0.34476f, true);
-            yield return F("TruckChassis", "MakeChassis", "rear_lift", -0.623094f, -0.36975f, true);
-            yield return F("TruckChassis", "make_body_superspeedway", "drag", 0.37f, 0.3f, true);
-            yield return F("TruckChassis", "make_body_superspeedway", "front_lift", -0.286480f, -0.17f, true);
-            yield return F("TruckChassis", "make_body_superspeedway", "rear_lift", -0.505553f, -0.3f, true);
-            yield return F("SprintCupChassisDLC", "MakeChassis", "drag", 0.543314f, 0.44f, false);
-            yield return F("SprintCupChassisDLC", "MakeChassis", "front_lift", -0.308812f, -0.317f, false);
-            yield return F("SprintCupChassisDLC", "MakeChassis", "rear_lift", -0.720561f, -0.517f, false);
-            yield return F("SprintCupChassisDLC", "make_body_superspeedway", "drag", 0.659150f, 0.53f, false);
-            yield return F("SprintCupChassisDLC", "make_body_superspeedway", "front_lift", -0.419954f, -0.338f, false);
-            yield return F("SprintCupChassisDLC", "make_body_superspeedway", "rear_lift", -0.866762f, -0.697f, false);
+            yield return F("SprintCupChassis", "MakeChassis", "drag", 0.3f, 0.3f, true);
+            yield return F("SprintCupChassis", "MakeChassis", "front_lift", -0.335f, -0.335f, true);
+            yield return F("SprintCupChassis", "MakeChassis", "rear_lift", -0.36f, -0.36f, true);
+            yield return F("SprintCupChassis", "make_body_superspeedway", "drag", 0.33f, 0.33f, true);
+            yield return F("SprintCupChassis", "make_body_superspeedway", "front_lift", -0.17f, -0.17f, true);
+            yield return F("SprintCupChassis", "make_body_superspeedway", "rear_lift", -0.3f, -0.3f, true);
+            yield return F("XfinityChassis", "MakeChassis", "drag", 0.3f, 0.3f, true);
+            yield return F("XfinityChassis", "MakeChassis", "front_lift", -0.335f, -0.335f, true);
+            yield return F("XfinityChassis", "MakeChassis", "rear_lift", -0.36f, -0.36f, true);
+            yield return F("XfinityChassis", "make_body_superspeedway", "drag", 0.3f, 0.3f, true);
+            yield return F("XfinityChassis", "make_body_superspeedway", "front_lift", -0.17f, -0.17f, true);
+            yield return F("XfinityChassis", "make_body_superspeedway", "rear_lift", -0.3f, -0.3f, true);
+            yield return F("TruckChassis", "MakeChassis", "drag", 0.3f, 0.3f, true);
+            yield return F("TruckChassis", "MakeChassis", "front_lift", -0.34476f, -0.34476f, true);
+            yield return F("TruckChassis", "MakeChassis", "rear_lift", -0.36975f, -0.36975f, true);
+            yield return F("TruckChassis", "make_body_superspeedway", "drag", 0.3f, 0.3f, true);
+            yield return F("TruckChassis", "make_body_superspeedway", "front_lift", -0.17f, -0.17f, true);
+            yield return F("TruckChassis", "make_body_superspeedway", "rear_lift", -0.3f, -0.3f, true);
+            yield return F("SprintCupChassisDLC", "MakeChassis", "drag", 0.44f, 0.44f, false);
+            yield return F("SprintCupChassisDLC", "MakeChassis", "front_lift", -0.31700885f, -0.31700885f, false);
+            yield return F("SprintCupChassisDLC", "MakeChassis", "rear_lift", -0.51662284f, -0.51662284f, false);
+            yield return F("SprintCupChassisDLC", "make_body_superspeedway", "drag", 0.53f, 0.53f, false);
+            yield return F("SprintCupChassisDLC", "make_body_superspeedway", "front_lift", -0.3376708f, -0.3376708f, false);
+            yield return F("SprintCupChassisDLC", "make_body_superspeedway", "rear_lift", -0.6969333f, -0.6969333f, false);
+            foreach (var edit in AssistOff())
+            {
+                yield return edit;
+            }
             yield return F("Physics", "MakeDefault", "max_draft_lon_carlen", 3f, 18.85f, true);
             yield return F("Physics", "MakeDefault", "min_draft_width_carwid", 0.125f, 0.763f, true);
             foreach (var method in new[] { "SetRestrictorPackage_Speedway_WithDucts", "SetRestrictorPackage_Speedway_NoDucts" })
             {
                 yield return F("Physics", method, "max_draft_lon_carlen", 3f, 12f, true);
                 yield return F("Physics", method, "min_draft_width_carwid", 0.125f, 1f, true);
+            }
+        }
+
+        private static IEnumerable<Edit> AssistOff()
+        {
+            yield return F("Physics", "SetAidsAndCompounds_Speedway", "arcade_grip", 0f, 0.2f, true);
+            yield return F("Physics", "SetAidsAndCompounds_Speedway", "arcade_total_yaw_force", 0f, 0.8f, true);
+            yield return F("Physics", "SetAidsAndCompounds_Speedway", "arcade_sludge", 0f, 1f, true);
+            yield return F("Physics", "SetAidsAndCompounds_Speedway", "arcade_off_sludge", 0f, 1f, true);
+            yield return F("Physics", "SetAidsAndCompounds_Speedway", "arcade_drag", 0f, 20f, true);
+            yield return F("Physics", "SetAidsAndCompounds_Speedway", "arcade_antiwall_effect_f", 0f, 1f, true);
+            yield return F("Physics", "SetAidsAndCompounds_Speedway", "arcade_antiwall_slowdown_f", 0f, 7.5f, true);
+            yield return F("Physics", "SetAidsAndCompounds_Speedway", "arcade_brake_help_f", 0f, 1f, true);
+            yield return F("Physics", "SetAidsAndCompounds_Speedway", "arcade_line_help_f", 0f, 1f, true);
+
+            yield return F("Physics", "SetAidsAndCompounds_Superspeedway", "arcade_grip", 0f, 0.2f, true);
+            yield return F("Physics", "SetAidsAndCompounds_Superspeedway", "arcade_total_yaw_force", 0f, 0.8f, true);
+            yield return F("Physics", "SetAidsAndCompounds_Superspeedway", "arcade_antiwall_effect_f", 0f, 1f, true);
+            yield return F("Physics", "SetAidsAndCompounds_Superspeedway", "arcade_line_help_f", 0f, 1f, true);
+
+            yield return F("Physics", "SetAidsAndCompounds_RoadCourse", "arcade_grip", 0f, 0.4f, true);
+            yield return F("Physics", "SetAidsAndCompounds_RoadCourse", "arcade_grip_min", 0f, 0.3f, true);
+            yield return F("Physics", "SetAidsAndCompounds_RoadCourse", "arcade_total_yaw_force", 0f, 0.8f, true);
+            yield return F("Physics", "SetAidsAndCompounds_RoadCourse", "arcade_sludge", 0f, 5f, true);
+            yield return F("Physics", "SetAidsAndCompounds_RoadCourse", "arcade_off_sludge", 0f, 5f, true);
+            yield return F("Physics", "SetAidsAndCompounds_RoadCourse", "arcade_drag", 0f, 30f, true);
+            yield return F("Physics", "SetAidsAndCompounds_RoadCourse", "arcade_brake_help_f", 0f, 1f, true);
+            yield return F("Physics", "SetAidsAndCompounds_RoadCourse", "arcade_line_help_f", 0f, 1f, true);
+
+            yield return F("Physics", "SetAidsAndCompounds_ShortTrack", "arcade_grip", 0f, 0.4f, true);
+            yield return F("Physics", "SetAidsAndCompounds_ShortTrack", "arcade_grip_min", 0f, 0.2f, true);
+            yield return F("Physics", "SetAidsAndCompounds_ShortTrack", "arcade_total_yaw_force", 0f, 0.8f, true);
+            yield return F("Physics", "SetAidsAndCompounds_ShortTrack", "arcade_sludge", 0f, 5f, true);
+            yield return F("Physics", "SetAidsAndCompounds_ShortTrack", "arcade_off_sludge", 0f, 5f, true);
+            yield return F("Physics", "SetAidsAndCompounds_ShortTrack", "arcade_drag", 0f, 30f, true);
+            yield return F("Physics", "SetAidsAndCompounds_ShortTrack", "arcade_brake_help_f", 0f, 1f, true);
+            yield return F("Physics", "SetAidsAndCompounds_ShortTrack", "arcade_line_help_f", 0f, 1f, true);
+
+            foreach (var method in new[] { "SetAidsAndCompounds_Dirt_Flat", "SetAidsAndCompounds_Dirt_Banked" })
+            {
+                yield return F("Physics", method, "arcade_grip", 0f, 0.4f, true);
+                yield return F("Physics", method, "arcade_grip_min", 0f, 0.4f, true);
+                yield return F("Physics", method, "arcade_total_yaw_force", 0f, 0.05f, true);
+                yield return F("Physics", method, "arcade_sludge", 0f, 0.2f, true);
+                yield return F("Physics", method, "arcade_off_sludge", 0f, 0.2f, true);
+                yield return F("Physics", method, "arcade_antiwall_effect_f", 0f, 1f, true);
+                yield return F("Physics", method, "arcade_antiwall_slowdown_f", 0f, 1.9f, true);
+                yield return F("Physics", method, "arcade_brake_help_f", 0f, 1.9f, true);
+                yield return F("Physics", method, "intermediate_yaw_control", 0f, 1f, true);
+                yield return F("Physics", method, "intermediate_yaw_control_min", 0f, 1f, true);
+            }
+
+            foreach (var pair in new[] { new object[] { "SetAidsAndCompounds_Dirt_Road", true }, new object[] { "SetAidsAndCompounds_Dirt_BristolCup", false } })
+            {
+                var method = (string)pair[0];
+                var required = (bool)pair[1];
+                yield return F("Physics", method, "arcade_grip", 0f, 0.4f, required);
+                yield return F("Physics", method, "arcade_grip_min", 0f, 0.4f, required);
+                yield return F("Physics", method, "arcade_total_yaw_force", 0f, 0.07f, required);
+                yield return F("Physics", method, "arcade_sludge", 0f, 0.2f, required);
+                yield return F("Physics", method, "arcade_off_sludge", 0f, 0.2f, required);
+                yield return F("Physics", method, "arcade_brake_help_f", 0f, 1.9f, required);
+                yield return F("Physics", method, "intermediate_yaw_control", 0f, 1f, required);
+                yield return F("Physics", method, "intermediate_yaw_control_min", 0f, 1f, required);
             }
         }
 
