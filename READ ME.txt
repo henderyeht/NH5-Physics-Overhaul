@@ -8,6 +8,7 @@ Changes:
 - Tire stiffness
 - Draft length
 - Draft width
+- Draft effect
 
 Built-in assists turned off:
 - Extra grip
