@@ -14,20 +14,23 @@ namespace SimHandling
     {
         private const int HeaderHeight = 110;
         private const string About =
-            "Physics Overhaul changes these values on Cup, Xfinity, Trucks, and Next Gen:\r\n"
-            + "- Tire grip\r\n"
-            + "- Grip under load\r\n"
-            + "- Straight-line grip\r\n"
+            "Physics Overhaul changes:\r\n"
             + "- Grip falloff\r\n"
-            + "- Drag\r\n"
-            + "- Front downforce\r\n"
-            + "- Rear downforce\r\n"
-            + "\r\n"
-            + "Dirt changes grip falloff.\r\n"
-            + "\r\n"
-            + "Every track changes:\r\n"
             + "- Draft length\r\n"
             + "- Draft width\r\n"
+            + "\r\n"
+            + "Built-in assists turned off:\r\n"
+            + "- Extra grip\r\n"
+            + "- Steering help\r\n"
+            + "- Racing line help\r\n"
+            + "- Brake help\r\n"
+            + "- Wall help\r\n"
+            + "- Stability help\r\n"
+            + "\r\n"
+            + "Still uses the game settings:\r\n"
+            + "- Driving aid menu\r\n"
+            + "- Garage setup\r\n"
+            + "- Track grip settings\r\n"
             + "\r\n"
             + "Close Heat 5 first.\r\n"
             + "Apply writes this onto the selected folder.\r\n"
@@ -193,7 +196,7 @@ namespace SimHandling
                 var on = HandlingPatch.IsApplied(install.Dll);
                 _status.ForeColor = on ? Theme.Yellow : Theme.Mute;
                 _status.Text = on
-                    ? "Physics Overhaul is on this build. Driving aids, garage setup, and track grip settings are unchanged."
+                    ? "Physics Overhaul is on this build. The driving aid menu, garage, and track grip settings still apply."
                     : "Physics Overhaul is off this build.";
             }
             catch (Exception ex)
