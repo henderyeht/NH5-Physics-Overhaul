@@ -9,12 +9,14 @@ Changes:
 - Draft length
 - Draft width
 - Draft effect
+- Center height
 
 Built-in assists turned off:
 - Extra grip
 - Steering help
 - Racing line help
 - Brake help
+- Brake rotation help
 - Wall help
 - Stability help
 
