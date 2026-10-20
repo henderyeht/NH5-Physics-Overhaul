@@ -453,6 +453,15 @@ namespace SimHandling
             yield return F("SprintCupChassisDLC", "make_body_superspeedway", "drag", 0.53f, 0.53f, false);
             yield return F("SprintCupChassisDLC", "make_body_superspeedway", "front_lift", -0.3376708f, -0.3376708f, false);
             yield return F("SprintCupChassisDLC", "make_body_superspeedway", "rear_lift", -0.6969333f, -0.6969333f, false);
+            // Published Cup height on a 110 inch wheelbase is 17. Other series keep their own ratio.
+            yield return F("SprintCupChassis", "MakeChassis", "cm_height", 17f, 9f, true);
+            yield return F("XfinityChassis", "MakeChassis", "cm_height", 17f, 9f, true);
+            yield return F("TruckChassis", "MakeChassis", "cm_height", 17f, 9f, true);
+            yield return F("SprintCupChassisDLC", "MakeChassis", "cm_height", 17f, 9f, false);
+            yield return F("DirtBankedChassis", "MakeChassis", "cm_height", 16.0555553f, 8.5f, true);
+            yield return F("DirtFlatChassis", "MakeChassis", "cm_height", 16.0555553f, 8.5f, true);
+            yield return F("DirtRoadChassis", "MakeChassis", "cm_height", 10.3888893f, 5.5f, true);
+            yield return F("EldoraTruckChassis", "MakeChassis", "cm_height", 18.88889f, 10f, true);
             foreach (var edit in AssistOff())
             {
                 yield return edit;
@@ -519,11 +528,13 @@ namespace SimHandling
             yield return F("Physics", "SetAidsAndCompounds_Speedway", "arcade_antiwall_effect_f", 0f, 1f, true);
             yield return F("Physics", "SetAidsAndCompounds_Speedway", "arcade_antiwall_slowdown_f", 0f, 7.5f, true);
             yield return F("Physics", "SetAidsAndCompounds_Speedway", "arcade_brake_help_f", 0f, 1f, true);
+            yield return F("Physics", "SetAidsAndCompounds_Speedway", "arcade_brake_oversteer", 0f, 0.5f, true);
             yield return F("Physics", "SetAidsAndCompounds_Speedway", "arcade_line_help_f", 0f, 1f, true);
 
             yield return F("Physics", "SetAidsAndCompounds_Superspeedway", "arcade_grip", 0f, 0.2f, true);
             yield return F("Physics", "SetAidsAndCompounds_Superspeedway", "arcade_total_yaw_force", 0f, 0.8f, true);
             yield return F("Physics", "SetAidsAndCompounds_Superspeedway", "arcade_antiwall_effect_f", 0f, 1f, true);
+            yield return F("Physics", "SetAidsAndCompounds_Superspeedway", "arcade_brake_oversteer", 0f, 0.2f, true);
             yield return F("Physics", "SetAidsAndCompounds_Superspeedway", "arcade_line_help_f", 0f, 1f, true);
 
             yield return F("Physics", "SetAidsAndCompounds_RoadCourse", "arcade_grip", 0f, 0.4f, true);
@@ -533,6 +544,7 @@ namespace SimHandling
             yield return F("Physics", "SetAidsAndCompounds_RoadCourse", "arcade_off_sludge", 0f, 5f, true);
             yield return F("Physics", "SetAidsAndCompounds_RoadCourse", "arcade_drag", 0f, 30f, true);
             yield return F("Physics", "SetAidsAndCompounds_RoadCourse", "arcade_brake_help_f", 0f, 1f, true);
+            yield return F("Physics", "SetAidsAndCompounds_RoadCourse", "arcade_brake_oversteer", 0f, 0.8f, true);
             yield return F("Physics", "SetAidsAndCompounds_RoadCourse", "arcade_line_help_f", 0f, 1f, true);
 
             yield return F("Physics", "SetAidsAndCompounds_ShortTrack", "arcade_grip", 0f, 0.4f, true);
@@ -542,6 +554,7 @@ namespace SimHandling
             yield return F("Physics", "SetAidsAndCompounds_ShortTrack", "arcade_off_sludge", 0f, 5f, true);
             yield return F("Physics", "SetAidsAndCompounds_ShortTrack", "arcade_drag", 0f, 30f, true);
             yield return F("Physics", "SetAidsAndCompounds_ShortTrack", "arcade_brake_help_f", 0f, 1f, true);
+            yield return F("Physics", "SetAidsAndCompounds_ShortTrack", "arcade_brake_oversteer", 0f, 0.8f, true);
             yield return F("Physics", "SetAidsAndCompounds_ShortTrack", "arcade_line_help_f", 0f, 1f, true);
 
             foreach (var method in new[] { "SetAidsAndCompounds_Dirt_Flat", "SetAidsAndCompounds_Dirt_Banked" })
@@ -554,6 +567,7 @@ namespace SimHandling
                 yield return F("Physics", method, "arcade_antiwall_effect_f", 0f, 1f, true);
                 yield return F("Physics", method, "arcade_antiwall_slowdown_f", 0f, 1.9f, true);
                 yield return F("Physics", method, "arcade_brake_help_f", 0f, 1.9f, true);
+                yield return F("Physics", method, "arcade_brake_oversteer", 0f, 1f, true);
                 yield return F("Physics", method, "intermediate_yaw_control", 0f, 1f, true);
                 yield return F("Physics", method, "intermediate_yaw_control_min", 0f, 1f, true);
             }
@@ -568,6 +582,7 @@ namespace SimHandling
                 yield return F("Physics", method, "arcade_sludge", 0f, 0.2f, required);
                 yield return F("Physics", method, "arcade_off_sludge", 0f, 0.2f, required);
                 yield return F("Physics", method, "arcade_brake_help_f", 0f, 1.9f, required);
+                yield return F("Physics", method, "arcade_brake_oversteer", 0f, 1f, required);
                 yield return F("Physics", method, "intermediate_yaw_control", 0f, 1f, required);
                 yield return F("Physics", method, "intermediate_yaw_control_min", 0f, 1f, required);
             }
