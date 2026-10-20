@@ -11,6 +11,7 @@
     <AssemblyTitle>NASCAR Heat 5 Sim Handling</AssemblyTitle>
     <Description>Applies a sim-style tire and scales Heat 5 driving aids from Easy through Expert.</Description>
     <Version>1.0.0</Version>
+    <Copyright>Copyright (C) 2026 henderyeht</Copyright>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <GenerateSupportedRuntime>false</GenerateSupportedRuntime>
     <DebugType>none</DebugType>
