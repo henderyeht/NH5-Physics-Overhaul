@@ -453,15 +453,15 @@ namespace SimHandling
             yield return F("SprintCupChassisDLC", "make_body_superspeedway", "drag", 0.53f, 0.53f, false);
             yield return F("SprintCupChassisDLC", "make_body_superspeedway", "front_lift", -0.3376708f, -0.3376708f, false);
             yield return F("SprintCupChassisDLC", "make_body_superspeedway", "rear_lift", -0.6969333f, -0.6969333f, false);
-            // Published Cup height on a 110 inch wheelbase is 17. Other series keep their own ratio.
-            yield return F("SprintCupChassis", "MakeChassis", "cm_height", 17f, 9f, true);
-            yield return F("XfinityChassis", "MakeChassis", "cm_height", 17f, 9f, true);
-            yield return F("TruckChassis", "MakeChassis", "cm_height", 17f, 9f, true);
-            yield return F("SprintCupChassisDLC", "MakeChassis", "cm_height", 17f, 9f, false);
-            yield return F("DirtBankedChassis", "MakeChassis", "cm_height", 16.0555553f, 8.5f, true);
-            yield return F("DirtFlatChassis", "MakeChassis", "cm_height", 16.0555553f, 8.5f, true);
-            yield return F("DirtRoadChassis", "MakeChassis", "cm_height", 10.3888893f, 5.5f, true);
-            yield return F("EldoraTruckChassis", "MakeChassis", "cm_height", 18.88889f, 10f, true);
+            // Cup height is 10. Other series take the same 10/9 step, so dirt stays different.
+            yield return F("SprintCupChassis", "MakeChassis", "cm_height", 10f, 9f, true);
+            yield return F("XfinityChassis", "MakeChassis", "cm_height", 10f, 9f, true);
+            yield return F("TruckChassis", "MakeChassis", "cm_height", 10f, 9f, true);
+            yield return F("SprintCupChassisDLC", "MakeChassis", "cm_height", 10f, 9f, false);
+            yield return F("DirtBankedChassis", "MakeChassis", "cm_height", 9.444445f, 8.5f, true);
+            yield return F("DirtFlatChassis", "MakeChassis", "cm_height", 9.444445f, 8.5f, true);
+            yield return F("DirtRoadChassis", "MakeChassis", "cm_height", 6.111111f, 5.5f, true);
+            yield return F("EldoraTruckChassis", "MakeChassis", "cm_height", 11.1111107f, 10f, true);
             foreach (var edit in AssistOff())
             {
                 yield return edit;
