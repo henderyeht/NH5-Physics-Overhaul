@@ -31,3 +31,9 @@ Competition keeps those settings. It still forces expert aids, faster wear, and 
 The list shows each game folder. Add build picks another folder.
 Apply writes this onto that folder. Remove puts these values back.
 A later grip change in Engine Modifier is left in place.
+
+License
+
+Copyright (C) 2026 henderyeht
+
+The original code in this project is free software under the GNU General Public License, version 3. You may share it and change it. Every copy, including a changed or built copy, must keep this copyright notice and the license in the LICENSE file. Third-party libraries keep their own licenses.
