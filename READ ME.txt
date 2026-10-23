@@ -30,7 +30,7 @@ Competition keeps those settings. It still forces expert aids, faster wear, and 
 
 The list shows each game folder. Add build picks another folder.
 Apply writes this onto that folder. Remove puts these values back.
-A later grip change in Engine Modifier is left in place.
+Changes from other utilities are left in place.
 
 License
 
