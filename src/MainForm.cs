@@ -43,7 +43,7 @@ namespace SimHandling
             + "Close Heat 5 first.\r\n"
             + "Apply writes this onto the selected folder.\r\n"
             + "Remove puts these values back.\r\n"
-            + "A later grip change in Engine Modifier is left in place.";
+            + "Changes from other utilities are left in place.";
         private readonly ComboBox _builds;
         private readonly Label _status;
         private readonly Label _path;
@@ -223,7 +223,7 @@ namespace SimHandling
 
         private void DoRemove()
         {
-            Run(HandlingPatch.Remove, "Physics Overhaul was removed. Engine grip changes that came after it were left in place.");
+            Run(HandlingPatch.Remove, "Physics Overhaul was removed. Changes from other utilities were left in place.");
         }
 
         private void Run(Func<string, HandlingResult> action, string ok)
