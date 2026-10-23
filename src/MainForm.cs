@@ -311,19 +311,12 @@ namespace SimHandling
             g.SmoothingMode = SmoothingMode.HighQuality;
             if (_banner != null && _banner.Width > 1 && _banner.Height > 1)
             {
-                var scale = dest.Height / (float)_banner.Height;
-                var drawnW = _banner.Width * scale;
-                if (drawnW <= dest.Width + 0.5f)
-                {
-                    var w = Math.Max(1, (int)Math.Round(drawnW));
-                    g.DrawImage(_banner, new Rectangle(dest.Right - w, dest.Y, w, dest.Height));
-                }
-                else
-                {
-                    var srcW = dest.Width / scale;
-                    var srcX = _banner.Width - srcW;
-                    g.DrawImage(_banner, dest, srcX, 0f, srcW, _banner.Height, GraphicsUnit.Pixel);
-                }
+                var scale = Math.Max(dest.Width / (float)_banner.Width, dest.Height / (float)_banner.Height);
+                var srcW = Math.Min(_banner.Width, dest.Width / scale);
+                var srcH = Math.Min(_banner.Height, dest.Height / scale);
+                var srcX = Math.Max(0f, _banner.Width - srcW);
+                var srcY = Math.Max(0f, (_banner.Height - srcH) / 2f);
+                g.DrawImage(_banner, dest, srcX, srcY, srcW, srcH, GraphicsUnit.Pixel);
             }
 
             var titleX = dest.X + 16f;
