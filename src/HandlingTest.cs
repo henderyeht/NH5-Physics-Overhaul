@@ -71,6 +71,7 @@ namespace SimHandling
 
         private static void CheckOne(string dll, string engine)
         {
+            CheckOtherUtilities(dll);
             var stock = File.ReadAllBytes(dll);
             var applied = HandlingPatch.Apply(dll);
             if (!applied.Applied)
@@ -145,6 +146,72 @@ namespace SimHandling
             {
                 throw new InvalidOperationException("Remove wiped the engine grip.");
             }
+        }
+
+        private static void CheckOtherUtilities(string dll)
+        {
+            var side = dll + ".other";
+            File.Copy(dll, side, true);
+            HandlingPatch.Poke(side, "Physics", "MakeDefault", "draft_influence", 0.4f);
+            HandlingPatch.Poke(side, "SprintCupChassis", "make_default_axle", "frict_k1", 1.8f);
+            HandlingPatch.Apply(side);
+            if (HandlingPatch.Peek(side, "Physics", "MakeDefault", "draft_influence") != 0.4f)
+            {
+                throw new InvalidOperationException("Apply overwrote another utility's draft.");
+            }
+
+            if (HandlingPatch.Peek(side, "SprintCupChassis", "make_default_axle", "frict_k1") != 1.8f)
+            {
+                throw new InvalidOperationException("Apply overwrote another utility's grip.");
+            }
+
+            if (HandlingPatch.Peek(side, "SprintCupChassis", "make_default_axle", "magic_c") != 1.525f)
+            {
+                throw new InvalidOperationException("Apply skipped the tire curve.");
+            }
+
+            HandlingPatch.Poke(side, "SprintCupChassis", "make_default_axle", "magic_c", 1.6f);
+            var before = File.ReadAllBytes(side);
+            HandlingPatch.Remove(side);
+            if (HandlingPatch.Peek(side, "SprintCupChassis", "make_default_axle", "magic_c") != 1f)
+            {
+                throw new InvalidOperationException("Remove left an older tire curve.");
+            }
+
+            if (HandlingPatch.Peek(side, "Physics", "MakeDefault", "draft_influence") != 0.4f)
+            {
+                throw new InvalidOperationException("Remove overwrote another utility's draft.");
+            }
+
+            if (HandlingPatch.Peek(side, "SprintCupChassis", "make_default_axle", "frict_k1") != 1.8f)
+            {
+                throw new InvalidOperationException("Remove overwrote another utility's grip.");
+            }
+
+            if (Same(before, File.ReadAllBytes(side)))
+            {
+                throw new InvalidOperationException("Remove did not put the older tire curve back.");
+            }
+
+            File.Delete(side);
+        }
+
+        private static bool Same(byte[] left, byte[] right)
+        {
+            if (left.Length != right.Length)
+            {
+                return false;
+            }
+
+            for (var i = 0; i < left.Length; i++)
+            {
+                if (left[i] != right[i])
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         private static string BuildEngine()
