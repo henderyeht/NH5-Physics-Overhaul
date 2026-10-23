@@ -24,7 +24,8 @@ namespace SimHandling
         public static bool IsApplied(string dllPath)
         {
             var bytes = File.ReadAllBytes(dllPath);
-            return ReadFloat(bytes, "SprintCupChassis", "make_default_axle", "magic_c") == 1.525f;
+            var curve = ReadFloat(bytes, "SprintCupChassis", "make_default_axle", "magic_c");
+            return curve == 1.525f || curve == 1.6f || curve == 1.3f;
         }
 
         public static HandlingResult Apply(string dllPath)
@@ -102,6 +103,11 @@ namespace SimHandling
             var current = (float)load.Operand;
             var offset = FileOffset(bytes, method, load);
             var key = method.DeclaringType.Name + "|" + Trim(method.Name) + "|" + edit.Field;
+            if (!CanReplace(current, edit))
+            {
+                return 0;
+            }
+
             if (!remove)
             {
                 if (current == edit.Value)
@@ -111,14 +117,14 @@ namespace SimHandling
 
                 if (!saved.ContainsKey(key))
                 {
-                    saved[key] = current;
+                    saved[key] = edit.Stock;
                 }
 
                 WriteFloat(bytes, offset, edit.Value);
                 return 1;
             }
 
-            if (current != edit.Value)
+            if (!IsOurs(current, edit))
             {
                 return 0;
             }
@@ -128,8 +134,44 @@ namespace SimHandling
                 prior = edit.Stock;
             }
 
+            if (current == prior)
+            {
+                return 0;
+            }
+
             WriteFloat(bytes, offset, prior);
             return 1;
+        }
+
+        // The DLL copy kept beside the per-value list is the file from the first edit.
+        // Other utilities may have changed it since. Apply and Remove never copy that file back.
+        // A site is written only when its live number is the game number or a number this utility has shipped.
+        private static bool CanReplace(float current, Edit edit)
+        {
+            return current == edit.Stock || current == edit.Value || IsEarlier(current, edit);
+        }
+
+        private static bool IsOurs(float current, Edit edit)
+        {
+            return current == edit.Value || IsEarlier(current, edit);
+        }
+
+        private static bool IsEarlier(float current, Edit edit)
+        {
+            if (edit.Earlier == null)
+            {
+                return false;
+            }
+
+            foreach (var old in edit.Earlier)
+            {
+                if (current == old)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private static int Preset(byte[] bytes, MethodDefinition method, Edit edit, Dictionary<string, float> saved, bool remove)
@@ -152,20 +194,30 @@ namespace SimHandling
             var current = (float)load.Operand;
             var offset = FileOffset(bytes, method, load);
             var key = "preset|" + edit.PresetIndex;
+            if (!CanReplace(current, edit))
+            {
+                return 0;
+            }
+
             if (!remove)
             {
-                if (!saved.ContainsKey(key))
-                {
-                    saved[key] = current;
-                }
-
                 if (current == edit.Value)
                 {
                     return 0;
                 }
 
+                if (!saved.ContainsKey(key))
+                {
+                    saved[key] = edit.Stock;
+                }
+
                 WriteFloat(bytes, offset, edit.Value);
                 return 1;
+            }
+
+            if (!IsOurs(current, edit))
+            {
+                return 0;
             }
 
             if (!saved.TryGetValue(key, out var prior))
@@ -220,6 +272,26 @@ namespace SimHandling
             }
 
             return (float)load.Operand;
+        }
+
+        internal static float Peek(string dllPath, string typeName, string methodName, string field)
+        {
+            return ReadFloat(File.ReadAllBytes(dllPath), typeName, methodName, field);
+        }
+
+        internal static void Poke(string dllPath, string typeName, string methodName, string field, float value)
+        {
+            var bytes = File.ReadAllBytes(dllPath);
+            var assembly = AssemblyDefinition.ReadAssembly(new MemoryStream(bytes), new ReaderParameters { InMemory = true });
+            var method = FindMethod(assembly, typeName, methodName);
+            var load = method == null ? null : LoadBeforeStore(method, field);
+            if (load == null)
+            {
+                throw new InvalidOperationException(typeName + "." + field + " was not found.");
+            }
+
+            WriteFloat(bytes, FileOffset(bytes, method, load), value);
+            Write(dllPath, bytes);
         }
 
         private static MethodDefinition FindMethod(AssemblyDefinition assembly, string typeName, string methodName)
@@ -302,6 +374,7 @@ namespace SimHandling
 
         private static void KeepBackup(string dllPath, byte[] original)
         {
+            // First-edit snapshot only. Never copied back over a file other utilities have changed since.
             var dest = Path.Combine(BackupRoot, Slot(dllPath), "Assembly-CSharp.dll");
             if (File.Exists(dest))
             {
@@ -407,61 +480,61 @@ namespace SimHandling
             foreach (var type in new[] { "SprintCupChassis", "XfinityChassis", "TruckChassis", "SprintCupChassisDLC" })
             {
                 var required = type != "SprintCupChassisDLC";
-                yield return F(type, "make_default_axle", "magic_b", peakB, 1f, required);
-                yield return F(type, "make_default_axle", "magic_c", 1.525f, 1f, required);
-                yield return F(type, "make_default_axle", "grip_fade", fade, 0.05f, required);
+                yield return F(type, "make_default_axle", "magic_b", peakB, 1f, required, 0.6591958f, 0.374151438f);
+                yield return F(type, "make_default_axle", "magic_c", 1.525f, 1f, required, 1.3f, 1.6f);
+                yield return F(type, "make_default_axle", "grip_fade", fade, 0.05f, required, 0.1089935f, 0.412214756f);
                 yield return F(type, "make_default_axle", "grip_fade_start", 4f, 9f, required);
-                yield return F(type, "make_default_axle", "grip_fade_stop", 7.75f, 12f, required);
-                yield return F(type, "make_default_axle", "frict_k1", 1.2f, 1.2f, required);
-                yield return F(type, "make_default_axle", "frict_k2", 1.1f, 1.1f, required);
-                yield return F(type, "make_default_axle", "long_frict", 1.1f, 1.1f, required);
-                yield return F(type, "MakeLiteFrontAxle", "magic_b", peakB, 0.714f, required);
-                yield return F(type, "MakeLiteFrontAxle", "magic_c", 1.525f, 1.4f, required);
+                yield return F(type, "make_default_axle", "grip_fade_stop", 7.75f, 12f, required, 7f, 8f);
+                yield return F(type, "make_default_axle", "frict_k1", 1.2f, 1.2f, required, 1.437792f);
+                yield return F(type, "make_default_axle", "frict_k2", 1.1f, 1.1f, required, 1.131201f);
+                yield return F(type, "make_default_axle", "long_frict", 1.1f, 1.1f, required, 1.310076f);
+                yield return F(type, "MakeLiteFrontAxle", "magic_b", peakB, 0.714f, required, 0.6591958f, 0.374151438f);
+                yield return F(type, "MakeLiteFrontAxle", "magic_c", 1.525f, 1.4f, required, 1.3f, 1.6f);
                 yield return F(type, "MakeLiteFrontAxle", "magic_e", 0f, -0.2f, required);
-                yield return F(type, "MakeLiteRearAxle", "magic_b", peakB, 0.714f, required);
-                yield return F(type, "MakeLiteRearAxle", "magic_c", 1.525f, 1.4f, required);
+                yield return F(type, "MakeLiteRearAxle", "magic_b", peakB, 0.714f, required, 0.6591958f, 0.374151438f);
+                yield return F(type, "MakeLiteRearAxle", "magic_c", 1.525f, 1.4f, required, 1.3f, 1.6f);
                 yield return F(type, "MakeLiteRearAxle", "magic_e", 0f, -0.2f, required);
             }
 
             foreach (var type in new[] { "DirtBankedChassis", "DirtFlatChassis", "DirtRoadChassis", "EldoraTruckChassis" })
             {
-                yield return F(type, "make_default_axle", "magic_b", 0.11102391f, 1f, true);
-                yield return F(type, "make_default_axle", "magic_c", 1.525f, 1f, true);
+                yield return F(type, "make_default_axle", "magic_b", 0.11102391f, 1f, true, 0.1757856f, 0.09977372f);
+                yield return F(type, "make_default_axle", "magic_c", 1.525f, 1f, true, 1.3f, 1.6f);
             }
 
-            yield return F("SprintCupChassis", "MakeChassis", "drag", 0.3f, 0.3f, true);
-            yield return F("SprintCupChassis", "MakeChassis", "front_lift", -0.335f, -0.335f, true);
-            yield return F("SprintCupChassis", "MakeChassis", "rear_lift", -0.36f, -0.36f, true);
-            yield return F("SprintCupChassis", "make_body_superspeedway", "drag", 0.33f, 0.33f, true);
-            yield return F("SprintCupChassis", "make_body_superspeedway", "front_lift", -0.17f, -0.17f, true);
-            yield return F("SprintCupChassis", "make_body_superspeedway", "rear_lift", -0.3f, -0.3f, true);
-            yield return F("XfinityChassis", "MakeChassis", "drag", 0.3f, 0.3f, true);
-            yield return F("XfinityChassis", "MakeChassis", "front_lift", -0.335f, -0.335f, true);
-            yield return F("XfinityChassis", "MakeChassis", "rear_lift", -0.36f, -0.36f, true);
-            yield return F("XfinityChassis", "make_body_superspeedway", "drag", 0.3f, 0.3f, true);
-            yield return F("XfinityChassis", "make_body_superspeedway", "front_lift", -0.17f, -0.17f, true);
-            yield return F("XfinityChassis", "make_body_superspeedway", "rear_lift", -0.3f, -0.3f, true);
-            yield return F("TruckChassis", "MakeChassis", "drag", 0.3f, 0.3f, true);
-            yield return F("TruckChassis", "MakeChassis", "front_lift", -0.34476f, -0.34476f, true);
-            yield return F("TruckChassis", "MakeChassis", "rear_lift", -0.36975f, -0.36975f, true);
-            yield return F("TruckChassis", "make_body_superspeedway", "drag", 0.3f, 0.3f, true);
-            yield return F("TruckChassis", "make_body_superspeedway", "front_lift", -0.17f, -0.17f, true);
-            yield return F("TruckChassis", "make_body_superspeedway", "rear_lift", -0.3f, -0.3f, true);
-            yield return F("SprintCupChassisDLC", "MakeChassis", "drag", 0.44f, 0.44f, false);
-            yield return F("SprintCupChassisDLC", "MakeChassis", "front_lift", -0.31700885f, -0.31700885f, false);
-            yield return F("SprintCupChassisDLC", "MakeChassis", "rear_lift", -0.51662284f, -0.51662284f, false);
-            yield return F("SprintCupChassisDLC", "make_body_superspeedway", "drag", 0.53f, 0.53f, false);
-            yield return F("SprintCupChassisDLC", "make_body_superspeedway", "front_lift", -0.3376708f, -0.3376708f, false);
-            yield return F("SprintCupChassisDLC", "make_body_superspeedway", "rear_lift", -0.6969333f, -0.6969333f, false);
+            yield return F("SprintCupChassis", "MakeChassis", "drag", 0.3f, 0.3f, true, 0.37f);
+            yield return F("SprintCupChassis", "MakeChassis", "front_lift", -0.335f, -0.335f, true, -0.503615f);
+            yield return F("SprintCupChassis", "MakeChassis", "rear_lift", -0.36f, -0.36f, true, -0.667583f);
+            yield return F("SprintCupChassis", "make_body_superspeedway", "drag", 0.33f, 0.33f, true, 0.407f);
+            yield return F("SprintCupChassis", "make_body_superspeedway", "front_lift", -0.17f, -0.17f, true, -0.286480f);
+            yield return F("SprintCupChassis", "make_body_superspeedway", "rear_lift", -0.3f, -0.3f, true, -0.505553f);
+            yield return F("XfinityChassis", "MakeChassis", "drag", 0.3f, 0.3f, true, 0.37f);
+            yield return F("XfinityChassis", "MakeChassis", "front_lift", -0.335f, -0.335f, true, -0.503615f);
+            yield return F("XfinityChassis", "MakeChassis", "rear_lift", -0.36f, -0.36f, true, -0.667583f);
+            yield return F("XfinityChassis", "make_body_superspeedway", "drag", 0.3f, 0.3f, true, 0.37f);
+            yield return F("XfinityChassis", "make_body_superspeedway", "front_lift", -0.17f, -0.17f, true, -0.286480f);
+            yield return F("XfinityChassis", "make_body_superspeedway", "rear_lift", -0.3f, -0.3f, true, -0.505553f);
+            yield return F("TruckChassis", "MakeChassis", "drag", 0.3f, 0.3f, true, 0.37f);
+            yield return F("TruckChassis", "MakeChassis", "front_lift", -0.34476f, -0.34476f, true, -0.580981f);
+            yield return F("TruckChassis", "MakeChassis", "rear_lift", -0.36975f, -0.36975f, true, -0.623094f);
+            yield return F("TruckChassis", "make_body_superspeedway", "drag", 0.3f, 0.3f, true, 0.37f);
+            yield return F("TruckChassis", "make_body_superspeedway", "front_lift", -0.17f, -0.17f, true, -0.286480f);
+            yield return F("TruckChassis", "make_body_superspeedway", "rear_lift", -0.3f, -0.3f, true, -0.505553f);
+            yield return F("SprintCupChassisDLC", "MakeChassis", "drag", 0.44f, 0.44f, false, 0.543314f);
+            yield return F("SprintCupChassisDLC", "MakeChassis", "front_lift", -0.31700885f, -0.31700885f, false, -0.308812f);
+            yield return F("SprintCupChassisDLC", "MakeChassis", "rear_lift", -0.51662284f, -0.51662284f, false, -0.720561f);
+            yield return F("SprintCupChassisDLC", "make_body_superspeedway", "drag", 0.53f, 0.53f, false, 0.659150f);
+            yield return F("SprintCupChassisDLC", "make_body_superspeedway", "front_lift", -0.3376708f, -0.3376708f, false, -0.419954f);
+            yield return F("SprintCupChassisDLC", "make_body_superspeedway", "rear_lift", -0.6969333f, -0.6969333f, false, -0.866762f);
             // Cup height is 10. Other series take the same 10/9 step, so dirt stays different.
-            yield return F("SprintCupChassis", "MakeChassis", "cm_height", 10f, 9f, true);
-            yield return F("XfinityChassis", "MakeChassis", "cm_height", 10f, 9f, true);
-            yield return F("TruckChassis", "MakeChassis", "cm_height", 10f, 9f, true);
-            yield return F("SprintCupChassisDLC", "MakeChassis", "cm_height", 10f, 9f, false);
-            yield return F("DirtBankedChassis", "MakeChassis", "cm_height", 9.444445f, 8.5f, true);
-            yield return F("DirtFlatChassis", "MakeChassis", "cm_height", 9.444445f, 8.5f, true);
-            yield return F("DirtRoadChassis", "MakeChassis", "cm_height", 6.111111f, 5.5f, true);
-            yield return F("EldoraTruckChassis", "MakeChassis", "cm_height", 11.1111107f, 10f, true);
+            yield return F("SprintCupChassis", "MakeChassis", "cm_height", 10f, 9f, true, 17f);
+            yield return F("XfinityChassis", "MakeChassis", "cm_height", 10f, 9f, true, 17f);
+            yield return F("TruckChassis", "MakeChassis", "cm_height", 10f, 9f, true, 17f);
+            yield return F("SprintCupChassisDLC", "MakeChassis", "cm_height", 10f, 9f, false, 17f);
+            yield return F("DirtBankedChassis", "MakeChassis", "cm_height", 9.444445f, 8.5f, true, 16.0555553f);
+            yield return F("DirtFlatChassis", "MakeChassis", "cm_height", 9.444445f, 8.5f, true, 16.0555553f);
+            yield return F("DirtRoadChassis", "MakeChassis", "cm_height", 6.111111f, 5.5f, true, 10.3888893f);
+            yield return F("EldoraTruckChassis", "MakeChassis", "cm_height", 11.1111107f, 10f, true, 18.88889f);
             foreach (var edit in AssistOff())
             {
                 yield return edit;
@@ -475,13 +548,13 @@ namespace SimHandling
             // Width and strength sit halfway between stock and the wider bubble.
             yield return F("Physics", "MakeDefault", "max_draft_lon_carlen", 3f, 18.85f, true);
             yield return F("Physics", "MakeDefault", "min_draft_width_carwid", 0.125f, 0.763f, true);
-            yield return F("Physics", "MakeDefault", "max_draft_width_carwid", 1.121f, 0.992f, true);
-            yield return F("Physics", "MakeDefault", "draft_influence", 0.22875f, 0.1575f, true);
+            yield return F("Physics", "MakeDefault", "max_draft_width_carwid", 1.121f, 0.992f, true, 1.25f);
+            yield return F("Physics", "MakeDefault", "draft_influence", 0.22875f, 0.1575f, true, 0.3f);
             foreach (var method in new[] { "SetRestrictorPackage_Speedway_WithDucts", "SetRestrictorPackage_Speedway_NoDucts" })
             {
                 yield return F("Physics", method, "max_draft_lon_carlen", 3f, 12f, true);
                 yield return F("Physics", method, "min_draft_width_carwid", 0.125f, 1f, true);
-                yield return F("Physics", method, "max_draft_width_carwid", 1.225f, 1.2f, true);
+                yield return F("Physics", method, "max_draft_width_carwid", 1.225f, 1.2f, true, 1.25f);
             }
         }
 
@@ -493,28 +566,28 @@ namespace SimHandling
             {
                 foreach (var field in new[] { "grip_lf", "grip_lr", "grip_rf", "grip_rr" })
                 {
-                    yield return F("Physics", method, field, 1.11750007f, 1.47f, true);
+                    yield return F("Physics", method, field, 1.11750007f, 1.47f, true, 1f);
                 }
 
                 foreach (var field in new[] { "stiff_lf", "stiff_lr", "stiff_rf", "stiff_rr" })
                 {
-                    yield return F("Physics", method, field, 1.05f, 1.2f, true);
+                    yield return F("Physics", method, field, 1.05f, 1.2f, true, 1f);
                 }
             }
 
             foreach (var field in new[] { "grip_lf", "grip_lr", "grip_rf", "grip_rr" })
             {
-                yield return F("Physics", "SetAidsAndCompounds_Superspeedway", field, plateGrip, 1.3f, true);
+                yield return F("Physics", "SetAidsAndCompounds_Superspeedway", field, plateGrip, 1.3f, true, 0.8843537f);
             }
 
             foreach (var field in new[] { "stiff_lf", "stiff_lr", "stiff_rf", "stiff_rr" })
             {
-                yield return F("Physics", "SetAidsAndCompounds_Superspeedway", field, plateStiff, 1.13f, true);
+                yield return F("Physics", "SetAidsAndCompounds_Superspeedway", field, plateStiff, 1.13f, true, 0.9416666f);
             }
 
             foreach (var field in new[] { "grip_lf", "grip_lr", "grip_rf", "grip_rr" })
             {
-                yield return F("Physics", "SetAidsAndCompounds_Dirt_BristolCup", field, 1.14030623f, 1.5f, false);
+                yield return F("Physics", "SetAidsAndCompounds_Dirt_BristolCup", field, 1.14030623f, 1.5f, false, 1.02040815f);
             }
         }
 
@@ -588,9 +661,9 @@ namespace SimHandling
             }
         }
 
-        private static Edit F(string type, string method, string field, float value, float stock, bool required)
+        private static Edit F(string type, string method, string field, float value, float stock, bool required, params float[] earlier)
         {
-            return new Edit { Type = type, Method = method, Field = field, Value = value, Stock = stock, Required = required, PresetIndex = -1 };
+            return new Edit { Type = type, Method = method, Field = field, Value = value, Stock = stock, Required = required, PresetIndex = -1, Earlier = earlier };
         }
 
         private sealed class Edit
@@ -602,6 +675,7 @@ namespace SimHandling
             public float Stock;
             public bool Required;
             public int PresetIndex;
+            public float[] Earlier = Array.Empty<float>();
         }
     }
 }
